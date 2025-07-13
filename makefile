@@ -1,8 +1,8 @@
 CC = cc
 CFLAGS = -std=c99 -Wall
-SRC = parsing2.c mpc.c
+SRC = tysonlang.c mpc.c
 LIBS = -ledit -lm
-OUT = parsing2
+OUT = tysonlang
 
 all:
 	$(CC) $(CFLAGS) $(SRC) $(LIBS) -o $(OUT)
