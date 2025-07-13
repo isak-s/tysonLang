@@ -448,6 +448,32 @@ void lenv_put(lenv* e, lval* k, lval* v) {
     strcpy(e->syms[e->count-1], k->sym);
 }
 
+/* Allows defining new functions within tysonlang */
+lval* builtin_def(lenv* e, lval* a) {
+    LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
+        "Function 'def' passed incorrect type!");
+    /* First argument is a symbol list: The name of the function */
+    lval* syms = a->cell[0];
+    /* Ensure they are all symbols */
+    for (int i = 0; i < syms->count; i++) {
+        LASSERT(a, syms->cell[i]->type == LVAL_SYM,
+        "Function 'def' cannot define non-symbol");
+    }
+
+    /* Check correct number of symbols and values */
+    LASSERT(a, syms->count == a->count - 1,
+    "Function 'def' cannot define oncorrect "
+    "number of values to symbols");
+
+    /* Assign copies of values to symbols */
+    for (int i = 0; i < syms->count; i++) {
+        /* Add one since the first argument is the funcion name itself*/
+        lenv_put(e, syms->cell[i], a->cell[i+1]);
+    }
+    lval_del(a);
+    return lval_sexpr();
+}
+
 void lenv_add_builtin(lenv* e, char* name, lbuiltin func) {
     lval* k = lval_sym(name);
     lval* v = lval_fun(func);
@@ -469,6 +495,9 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "-", builtin_sub);
     lenv_add_builtin(e, "*", builtin_mul);
     lenv_add_builtin(e, "/", builtin_div);
+
+    /* User defined functions */
+    lenv_add_builtin(e, "def", builtin_def);
 }
 
 lval* builtin(lenv* e, lval* a, char* func) {
