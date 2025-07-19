@@ -265,7 +265,7 @@ void lval_print(lval* v) {
         case LVAL_SYM:   printf("%s", v->sym); break;
         case LVAL_SEXPR: lval_expr_print(v, '(', ')'); break;
         case LVAL_QEXPR: lval_expr_print(v, '{', '}'); break;
-        case LVAL_FUN: printf("<Function>"); break;
+        case LVAL_FUN:   printf("<function>"); break;
     }
 }
 
@@ -493,6 +493,16 @@ void lenv_put(lenv* e, lval* k, lval* v) {
     strcpy(e->syms[e->count-1], k->sym);
 }
 
+lval* builtin_get_env(lenv* e, lval* a) {
+    lval* env_list = lval_sexpr();
+
+    for (int i = 0; i < e->count-1; i++) {
+        lval_add(env_list, lval_sym(e->syms[i]));
+    }
+
+    return env_list; /* {head list tail etc} */
+}
+
 /* Allows defining new functions within tysonlang */
 lval* builtin_def(lenv* e, lval* a) {
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
@@ -543,6 +553,9 @@ void lenv_add_builtins(lenv* e) {
 
     /* User defined functions */
     lenv_add_builtin(e, "def", builtin_def);
+
+    /* Utils */
+    lenv_add_builtin(e, "get_env", builtin_get_env);
 }
 
 lval* builtin(lenv* e, lval* a, char* func) {
