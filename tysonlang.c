@@ -92,13 +92,19 @@ struct lenv {
     "Function '%s' passed {}!", \
     function_name
 
-#define LASSERT_ARG_NUM(function_name, a, expected) \
-    LASSERT(a, a->count == 2, \
-    TOO_MANY_ARGUMENTS_EXCEPTION(function_name, a->count, expected))
+#define LASSERT_TYPE(func, args, index, expect) \
+  LASSERT(args, args->cell[index]->type == expect, \
+    "Function '%s' passed incorrect type for argument %i. Got %s, Expected %s.", \
+    func, index, ltype_name(args->cell[index]->type), ltype_name(expect))
 
-#define LASSERT_TYPE(function_name, a, arg_index, expected) \
-    LASSERT(a, a->cell[arg_index]->type == LVAL_QEXPR, \
-    WRONG_TYPE_EXCEPTION(function_name, a->cell[arg_index]->type, arg_index, ltype_name(LVAL_QEXPR)))
+#define LASSERT_ARG_NUM(func, args, num) \
+  LASSERT(args, args->count == num, \
+    "Function '%s' passed incorrect number of arguments. Got %i, Expected %i.", \
+    func, args->count, num)
+
+#define LASSERT_NOT_EMPTY(func, args, index) \
+  LASSERT(args, args->cell[index]->count != 0, \
+    "Function '%s' passed {} for argument %i.", func, index);
 
 char* ltype_name(int t) {
     switch(t) {
@@ -401,6 +407,96 @@ lval* lval_join(lval* x, lval* y) {
     return x;
 }
 
+int lval_eq(lval* x, lval* y) {
+
+    if (x->type != y->type) { return 0; }
+
+    switch (x->type) {
+        case LVAL_NUM: return (x->num == y->num);
+        case LVAL_ERR: return (strcmp(x->err, y->err) == 0);
+        case LVAL_SYM: return (strcmp(x->sym, y->sym) == 0);
+        case LVAL_FUN:
+            if (x->builtin || y->builtin) {
+                return x->builtin == y->builtin;
+            } else {
+                return lval_eq(x->formals, y->formals) &&
+                    lval_eq(x->body, y->body);
+            }
+        /* If it's a list, compare every element within. */
+        case LVAL_QEXPR:
+        case LVAL_SEXPR:
+            if (x->count != y->count) { return 0; }
+            for (int i = 0; i < x->count; i++) {
+                if (!lval_eq(x->cell[i], y->cell[i])) { return 0; }
+            }
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+/* Only works on number types! */
+#define ORDERING(op, a, comp) \
+    LASSERT_ARG_NUM(op, a, 2); \
+    LASSERT_TYPE(op, a, 0, LVAL_NUM); \
+    LASSERT_TYPE(op, a, 1, LVAL_NUM); \
+    int r = comp; \
+    lval_del(a); \
+    return lval_num(r)
+
+lval* builtin_leq(lenv* e, lval* a) {
+    ORDERING("<=", a, (a->cell[0]->num <= a->cell[1]->num));
+}
+
+lval* builtin_geq(lenv* e, lval* a) {
+    ORDERING(">=", a, (a->cell[0]->num >= a->cell[1]->num));
+}
+
+lval* builtin_lt(lenv* e, lval* a) {
+    ORDERING("<", a, (a->cell[0]->num < a->cell[1]->num));
+}
+
+lval* builtin_gt(lenv* e, lval* a) {
+    ORDERING(">", a, (a->cell[0]->num > a->cell[1]->num));
+}
+
+lval* builtin_eq(lenv* e, lval* a) {
+    LASSERT_ARG_NUM("==", a, 2);
+    int r = lval_eq(a->cell[0], a->cell[1]);
+    lval_del(a);
+    return lval_num(r);
+}
+
+lval* builtin_neq(lenv* e, lval* a) {
+    LASSERT_ARG_NUM("!=", a, 2);
+    int r = !lval_eq(a->cell[0], a->cell[1]);
+    lval_del(a);
+    return lval_num(r);
+}
+
+lval* builtin_if(lenv* e, lval* a) {
+    /* Acts like a ternary operator */
+    LASSERT_ARG_NUM("if", a, 3);
+    LASSERT_TYPE("if", a, 0, LVAL_NUM);
+    LASSERT_TYPE("if", a, 1, LVAL_QEXPR);
+    LASSERT_TYPE("if", a, 2, LVAL_QEXPR);
+
+    lval* x;
+    /* Mark them as evaluatable */
+    a->cell[1]->type = LVAL_SEXPR;
+    a->cell[2]->type = LVAL_SEXPR;
+
+    if (a->cell[0]->num) {
+        x = lval_eval(e, lval_pop(a, 1));
+    } else {
+        x = lval_eval(e, lval_pop(a, 2));
+    }
+
+    lval_del(a);
+
+    return x;
+
+}
 
 lval* builtin_op(lenv* e, lval* a, char* op) {
 
@@ -742,6 +838,15 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "eval", builtin_eval);
     lenv_add_builtin(e, "join", builtin_join);
     lenv_add_builtin(e, "len", builtin_len);
+
+    /* Conditionals */
+    lenv_add_builtin(e, "if", builtin_if);
+    lenv_add_builtin(e, "==", builtin_eq);
+    lenv_add_builtin(e, "!=", builtin_neq);
+    lenv_add_builtin(e, ">",  builtin_gt);
+    lenv_add_builtin(e, "<",  builtin_lt);
+    lenv_add_builtin(e, ">=", builtin_geq);
+    lenv_add_builtin(e, "<=", builtin_leq);
 
     /* Mathematical functions */
     lenv_add_builtin(e, "+", builtin_add);
