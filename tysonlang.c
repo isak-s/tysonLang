@@ -490,6 +490,43 @@ lval* builtin_eval(lenv* e, lval* a) {
     return lval_eval(e, x);
 }
 
+void lenv_put(lenv* e, lval* k, lval* v);
+
+lval* lval_call(lenv* e, lval* f, lval* a) {
+
+    /* If it's builtin, simply call it */
+    if (f->builtin) { return f->builtin(e, a); }
+
+    int given = a->count;
+    int total = f->formals->count;
+
+    while (a->count) {
+
+        if (f->formals->count == 0) {
+            lval_del(a);
+            return lval_err(TOO_MANY_ARGUMENTS_EXCEPTION("<>", given, total));
+        }
+
+        lval* sym = lval_pop(f->formals, 0);
+        lval* val = lval_pop(a, 0);
+        lenv_put(f->env, sym, val);
+
+        lval_del(sym);
+        lval_del(val);
+    }
+
+    lval_del(a);
+
+    /* If all formals have been bound, evaluate */
+    if (f->formals->count == 0) {
+        f->env->parent = e;
+        return builtin_eval(
+            f->env, lval_add(lval_sexpr(), lval_copy(f->body)));
+    }
+    /* Else return a copy of itself with some argumets filled */
+    return lval_copy(f);
+}
+
 lval* builtin_join(lenv* e, lval* a) {
     for (int i = 0; i < a->count; i++) {
         LASSERT(a, a->cell[i]->type == LVAL_QEXPR,
@@ -723,7 +760,7 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
         return lval_err("first element is not a function!");
     }
     /* Call the function that f points to, with the given environment */
-    lval* result = f->builtin(e, v);
+    lval* result = lval_call(e, f, v);
     lval_del(f);
     return result;
 }
