@@ -1,7 +1,7 @@
 <table>
   <tr>
     <td>
-      <img src=".github/images/lisp_user.png" alt="Image of average lisp user" width="150">
+      <img src=".github/images/lisp_user.png" alt="Image of average lisp user" width="300">
     </td>
     <td>
       <h3>TysonLang</h3>
@@ -11,9 +11,9 @@
       </p>
       <p>
         <img src="https://img.shields.io/badge/platform-linux--x86%20%7C%20macOS%20%7C%20windows-lightgrey"><br>
-        <img src="https://img.shields.io/badge/language-C-blue"><br>
         <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">
-          <img src="https://img.shields.io/badge/license-CC%20BY--NC--SA%203.0-lightgrey.svg" alt="License: CC BY-NC-SA 3.0">
+          <img src="https://img.shields.io/badge/license-CC%20BY--NC--SA%203.0-lightgrey.svg" alt="License: CC BY-NC-SA 3.0"> <br>
+        <img src="https://img.shields.io/badge/language-C-blue">
         </a>
       </p>
     </td>
