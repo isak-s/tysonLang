@@ -372,6 +372,7 @@ lval* lval_read(mpc_ast_t* t) {
         if (strcmp(t->children[i]->contents, "{") == 0) { continue; }
         if (strcmp(t->children[i]->contents, "}") == 0) { continue; }
         if (strcmp(t->children[i]->tag,  "regex") == 0) { continue; }
+        if (strstr(t->children[i]->tag, "comment")) { continue; }
         x = lval_add(x, lval_read(t->children[i]));
     }
 
@@ -971,6 +972,40 @@ lval* lval_eval(lenv* e, lval* v) {
     return v;
 }
 
+lval* builtin_load(lenv* e, lval* a) {
+    LASSERT_ARG_NUM("load", a, 1);
+    LASSERT_TYPE("load", a, 0, LVAL_STR)
+
+    /* Parse file from given name (str) */
+    mpc_result_t r;
+
+    if (!(mpc_parse_contents(a->cell[0]->str, Lispy, &r))) {
+        /* get parse error as string */
+        char* err_msg = mpc_err_string(r.error);
+        mpc_err_delete(r.error);
+        lval* err = lval_err("Could not load library %s", err_msg);
+        free(err_msg);
+        lval_del(a);
+
+        return err;
+    }
+
+    /* read contents */
+    lval* expr = lval_read(r.output);
+    mpc_ast_delete(r.output);
+
+    while (expr->count) {
+        lval* x = lval_eval(e, lval_pop(expr, 0));
+        /* If error during eval, print */
+        if (x->type == LVAL_ERR) { lval_println(x); }
+        lval_del(x);
+    }
+    lval_del(expr);
+    lval_del(a);
+    /* Empty list */
+    return lval_sexpr();
+}
+
 int main(int argc, char** argv) {
 
   Number  = mpc_new("number");
@@ -1003,7 +1038,20 @@ int main(int argc, char** argv) {
 
   lenv* e = lenv_new();
   lenv_add_builtins(e);
-  /* In a never ending loop */
+
+    /* The user passed in filenames */
+    if (argc >= 2) {
+        for (int i = 1  ; i < argc; i++) {
+            lval* args = lval_add(lval_sexpr(), lval_str(argv[i]));
+            /* Run the files  /  load into memory */
+            lval* x = builtin_load(e, args);
+
+            if (x->type == LVAL_ERR) { lval_println(x); }
+            lval_del(x);
+        }
+        return 0;
+    }
+
   while (1) {
 
     /* Output our prompt and get input */
@@ -1030,6 +1078,6 @@ int main(int argc, char** argv) {
 
   }
   lenv_del(e);
-  mpc_cleanup(6, Number, Symbol, Sexpr, Qexpr, Expr, Lispy);
+  mpc_cleanup(8, Number, Symbol, String, Comment, Sexpr, Qexpr, Expr, Lispy);
   return 0;
 }
