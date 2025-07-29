@@ -1,6 +1,6 @@
 CC = cc
-CFLAGS = -std=c99 -Wall
-SRC = tysonlang.c mpc.c
+CFLAGS = -std=c99 -Wall -Ilib/mpc
+SRC = src/tysonlang.c lib/mpc/mpc.c
 LIBS = -ledit -lm
 OUT = tysonlang
 

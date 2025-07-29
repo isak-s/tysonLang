@@ -1,4 +1,4 @@
-![Image of average lisp user](lisp_user.png)
+![Image of average lisp user](.github/images/lisp_user.png)
 
 The revolutionary lispy tysonLang programming language.
 
