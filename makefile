@@ -11,7 +11,7 @@ clean:
 	rm -f $(OUT)
 
 tyson:
-	@./$(OUT) $(filter-out $@,$(MAKECMDGOALS))
+	@./$(OUT) lib-tyson/std.tyson $(filter-out $@,$(MAKECMDGOALS))
 
 %:
 	@:
