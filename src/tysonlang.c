@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 
 #include "mpc.h"
 
@@ -1059,7 +1060,7 @@ int main(int argc, char** argv) {
 
 
   /* Print Version and Exit Information */
-  puts("TysonLang Version 0.0.0.2.1");
+  puts("TysonLang Version 1.0.0.0.0");
   puts("Press Ctrl+c to Exit\n");
 
   lenv* e = lenv_new();
@@ -1068,6 +1069,9 @@ int main(int argc, char** argv) {
     /* The user passed in filenames */
     if (argc >= 2) {
         for (int i = 1  ; i < argc; i++) {
+            if (i == argc - 1 && strcasecmp(argv[argc-1], "repl") == 0) {
+                goto REPL;
+            }
             lval* args = lval_add(lval_sexpr(), lval_str(argv[i]));
             /* Run the files  /  load into memory */
             lval* x = builtin_load(e, args);
@@ -1077,7 +1081,7 @@ int main(int argc, char** argv) {
         }
         return 0;
     }
-
+    REPL:
   while (1) {
 
     /* Output our prompt and get input */
