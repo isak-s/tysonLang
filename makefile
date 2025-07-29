@@ -11,5 +11,7 @@ clean:
 	rm -f $(OUT)
 
 tyson:
-	@echo "Running Tyson mode..."
-	./$(OUT) "Tyson-specific input"
+	@./$(OUT) $(filter-out $@,$(MAKECMDGOALS))
+
+%:
+	@:
