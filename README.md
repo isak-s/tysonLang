@@ -1,7 +1,25 @@
-# TysonLang
+<table>
+  <tr>
+    <td>
+      <img src=".github/images/lisp_user.png" alt="Image of average lisp user" width="150">
+    </td>
+    <td>
+      <h3>TysonLang</h3>
+      <p>
+        A functional, list-based programming language.<br>
+        The interpreter for this <a href="https://sv.wikipedia.org/wiki/Lisp">LISP</a> is written in 100% C.
+      </p>
+      <p>
+        <img src="https://img.shields.io/badge/platform-linux--x86%20%7C%20macOS%20%7C%20windows-lightgrey"><br>
+        <img src="https://img.shields.io/badge/language-C-blue"><br>
+        <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">
+          <img src="https://img.shields.io/badge/license-CC%20BY--NC--SA%203.0-lightgrey.svg" alt="License: CC BY-NC-SA 3.0">
+        </a>
+      </p>
+    </td>
+  </tr>
+</table>
 
-| ![Image of average lisp user](.github/images/lisp_user.png) | **TysonLang** <br> is a functional  list based programming language.<br>The interpreter for this [LISP](https://sv.wikipedia.org/wiki/Lisp) is written in 100% C. |
-|--------------------------|-------------------------------|
 
 ## Running a program
 1. Compile the interpreter
