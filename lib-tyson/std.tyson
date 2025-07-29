@@ -1,0 +1,66 @@
+; atoms
+(def {nil} {})
+(def {true} 1)
+
+(def {fun} (\ {args body} {
+  ; Better function definitions
+  def (head args) (\ (tail args) body)
+}))
+
+; Stuff for currying
+(fun {unpack f xs} {
+  eval (join (list f) xs)
+})
+
+(fun {pack f & xs} {
+  f xs
+})
+
+; curried and uncurried calling
+(def {curry} unpack)
+(def {uncurry} pack)
+
+(fun {do & l} {
+  ; perform stuff in sequence
+  ; returns the result of the last thing it does
+
+  if (== l nil)
+  {nil}
+  {last l}
+})
+
+; open new scope.
+; save results to local variables using the = operator
+(fun {let b} {
+  ((\ {_} b) ())
+})
+
+; logical funcitons
+(fun {not x} {- 1 x})
+(fun {or x y} {+ x y})
+(fun {and x y} {* x y})
+
+(fun {reverse l} {
+  if (== l {})
+    {{}}
+    {join (reverse (tail l)) (head l)}
+})
+
+; list stuff
+(fun {fst l} {
+  eval (head l)
+})
+
+(fun {nth n l} {
+  ; returs nth item in the list
+  if (== n 0)
+    {fst l}
+    {nth (- n 1) (tail l)}
+})
+
+(fun {last l} {
+  ; returns the last item in the list
+  nth (- (len l) 1) l
+})
+
+(print "loaded standard library")
