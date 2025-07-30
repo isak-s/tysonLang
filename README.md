@@ -1,7 +1,7 @@
 <table width="100%">
   <tr>
-    <td style="width: 280px; vertical-align: top;">
-      <img src=".github/images/lisp_user.png" alt="Image of average lisp user" width="280">
+    <td style="width: 250px; vertical-align: top;">
+      <img src=".github/images/lisp_user.png" alt="Image of average lisp user" width="250">
     </td>
     <td style="width: 100%; vertical-align: top;">
       <h3>TysonLang</h3>
