@@ -46,9 +46,13 @@
     {join (reverse (tail l)) (head l)}
 })
 
-; list stuff
+; list functions
 (fun {fst l} {
   eval (head l)
+})
+
+(fun {snd l} {
+  eval (head (tail l))
 })
 
 (fun {nth n l} {
@@ -61,6 +65,97 @@
 (fun {last l} {
   ; returns the last item in the list
   nth (- (len l) 1) l
+})
+
+(fun {take n l} {
+  ; returns first n items in a list
+  if (== n 0)
+  {nil}
+  {join (head l) (take (- n 1) (tail l))}
+})
+
+(fun {drop n l} {
+  ; returns all except the n first elements in a list
+  if (== n 0)
+  {l}
+  {drop (- n 1) (tail l)}
+})
+
+(fun {split n l} {
+  ; Split list at index n
+  list (take n l) (drop n l)
+})
+
+(fun {in x l} {
+  ; returns true if x is an element in l
+  if (== l nil)
+  {false}
+  {if (== x (fst l))
+    {true}
+    {in x (tail l)}
+  }
+})
+
+(fun {map f l} {
+  if (== l nil)
+  {nil}
+  {join (list (f (fst l))) (map f (tail l))}
+})
+
+(fun {filter f l} {
+  if (== l nil)
+  {nil}
+  {join (
+    if (f (fst l))
+    {head l}
+    {nil})
+  (filter f (tail l))
+  }
+})
+
+(fun {foldLeft f z l} {
+  if (== l nil)
+  {z}
+  {foldLeft f (f z (fst l)) (tail l)}
+})
+
+(fun {sum l} {
+  foldLeft + 0 l
+})
+
+(fun {cumProd l} {
+  foldLeft * 1 l
+})
+
+; conditional functions
+(fun {select & cs} {
+  ; Like a switch case but cooler
+  ; takes in 0 or more 2 tuples as input
+  ; Evaluate the first element. If true, evaluate and return second.
+  ; else perform same thing on rest of list.
+  if (== cs nil)
+  {error "No selection found"}
+  {if (fst (fst cs))
+    {snd (fst cs)}
+    {unpack select (tail cs)}
+  }
+})
+
+; default case for switch statement
+(fun {otherwise} true)
+
+(fun {case x & cs} {
+  ; regular case match with equality check
+  ; takes in 0 or more 2 tuples as input
+  ; Evaluate the first element. If true, evaluate and return second.
+  ; else perform same thing on rest of list.
+
+  if (== cs nil)
+  {error "No case found"}
+  {if (== x (fst (fst cs)))
+    {snd (fst cs)}
+    {unpack case (join (list x) (tail cs))}
+  }
 })
 
 (print "loaded standard library")
