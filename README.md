@@ -1,13 +1,14 @@
-<table>
+<table width="100%">
   <tr>
-    <td>
+    <td style="width: 300px; vertical-align: top;">
       <img src=".github/images/lisp_user.png" alt="Image of average lisp user" width="300">
     </td>
-    <td>
+    <td style="width: 100%; vertical-align: top;">
       <h3>TysonLang</h3>
       <p>
-        A functional, list-based programming language.<br>
-        The interpreter for this <a href="https://sv.wikipedia.org/wiki/Lisp">LISP</a> is written in 100% C.
+        A functional, dynamically typed, list-based programming language.<br>
+        The interpreter for this <a href="https://sv.wikipedia.org/wiki/Lisp">LISP</a> dialect is written in 100% C.<br>
+        The standard library is written in tysonlang itself.
       </p>
       <p>
         <img src="https://img.shields.io/badge/platform-linux--x86%20%7C%20macOS%20%7C%20windows-lightgrey"><br>
@@ -21,7 +22,7 @@
 </table>
 
 
-## Running a program
+## Usage
 1. Compile the interpreter
 ```sh
     make
@@ -31,7 +32,7 @@
     make tyson fileName.tyson
 ```
 
-## REPL
+### REPL
 ```sh
     make tyson repl
 ```
