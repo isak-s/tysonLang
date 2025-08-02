@@ -142,7 +142,7 @@
 })
 
 ; default case for switch statement
-(fun {otherwise} true)
+(def {otherwise} true)
 
 (fun {case x & cs} {
   ; regular case match with equality check

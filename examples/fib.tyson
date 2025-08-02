@@ -1,12 +1,7 @@
 (fun {fib n} {
     ; if item 0 evaluates to true, item 1 gets returned when using select
     select
-        ; base case. return 0 for n = 0
-        {(== n 0) 0}
-        ; base case. return 1 for n = 1
+        {(== n 0) 0} 
         {(== n 1) 1}
-        {otherwise (
-            + (fib (- n 1) fib (- n 2))
-            )
-        }
+        {otherwise (+ (fib (- n 1)) (fib (- n 2)))}
 })
