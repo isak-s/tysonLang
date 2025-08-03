@@ -21,6 +21,8 @@
   </tr>
 </table>
 
+## Try it out!
+https://tysonlang-cd8a7.web.app
 
 ## Usage
 1. Compile the interpreter
