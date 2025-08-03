@@ -1184,6 +1184,14 @@ void tyson_init() {
 
   e = lenv_new();
   lenv_add_builtins(e);
+
+    // Load standard lib
+    lval* args = lval_add(lval_sexpr(), lval_str("lib-tyson/std.tyson"));
+    /* Run the files  /  load into memory */
+    lval* x = builtin_load(e, args);
+
+    if (x->type == LVAL_ERR) { lval_println(x); }
+    lval_del(x);
 }
 
 const char* eval_string(const char* input) {

@@ -20,7 +20,8 @@ wasm:
 		-s EXPORTED_FUNCTIONS='["_tyson_init", "_eval_string"]' \
 		-s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
 		-s EXIT_RUNTIME=1 \
-		-o web/tyson.js
+		-o web/tyson.js \
+		--embed-file lib-tyson/std.tyson
 
 %:
 	@:
