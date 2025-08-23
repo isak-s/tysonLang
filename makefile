@@ -18,10 +18,11 @@ wasm:
 		-Ilib/mpc \
 		-s WASM=1 \
 		-s EXPORTED_FUNCTIONS='["_tyson_init", "_eval_string"]' \
-		-s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' \
+		-s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "FS"]' \
 		-s EXIT_RUNTIME=1 \
 		-o web/tyson.js \
-		--embed-file lib-tyson/std.tyson
+  		--embed-file lib-tyson/std.tyson@/std.tyson
+
 
 %:
 	@:

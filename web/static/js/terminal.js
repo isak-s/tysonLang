@@ -55,10 +55,10 @@ function handleKeypress(e, input, output) {
         return `Commands:
   help  - show this message
   clear - clear the screen
-  test  - show test message
+  std - print entire standard library
   (or enter any valid TysonLang expression)`
-      case 'test':
-        return 'Test successful!'
+      case 'std':
+        return FS.readFile('std.tyson', { encoding: 'utf8' }); // contents of std.tyson
       default:
         if (typeof Module !== 'undefined' && Module.ccall) {
           try {

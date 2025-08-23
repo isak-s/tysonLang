@@ -1186,7 +1186,7 @@ void tyson_init() {
   lenv_add_builtins(e);
 
     // Load standard lib
-    lval* args = lval_add(lval_sexpr(), lval_str("lib-tyson/std.tyson"));
+    lval* args = lval_add(lval_sexpr(), lval_str("std.tyson"));
     /* Run the files  /  load into memory */
     lval* x = builtin_load(e, args);
 

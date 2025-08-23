@@ -4027,6 +4027,7 @@ async function createWasm() {
       return (...args) => ccall(ident, returnType, argTypes, args, opts);
     };
 
+
   var FS_createPath = (...args) => FS.createPath(...args);
 
 
@@ -4087,6 +4088,7 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   Module['FS_unlink'] = FS_unlink;
   Module['FS_createPath'] = FS_createPath;
   Module['FS_createDevice'] = FS_createDevice;
+  Module['FS'] = FS;
   Module['FS_createDataFile'] = FS_createDataFile;
   Module['FS_createLazyFile'] = FS_createLazyFile;
   var missingLibrarySymbols = [
@@ -4350,7 +4352,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'FS_stdin_getChar_buffer',
   'FS_stdin_getChar',
   'FS_readFile',
-  'FS',
   'FS_root',
   'FS_mounts',
   'FS_devices',
