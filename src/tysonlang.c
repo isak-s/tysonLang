@@ -25,8 +25,10 @@ void add_history(char* unused) {}
 
 /* Otherwise include the editline headers */
 #else
+#ifndef __EMSCRIPTEN__
 #include <editline/readline.h>
 #include <editline/history.h>
+#endif
 #endif
 
 ;
@@ -1033,6 +1035,7 @@ lval* builtin_load(lenv* e, lval* a) {
     return lval_sexpr();
 }
 
+#ifndef __EMSCRIPTEN__
 int main(int argc, char** argv) {
 
   Number  = mpc_new("number");
@@ -1082,6 +1085,7 @@ int main(int argc, char** argv) {
         return 0;
     }
     REPL:
+
   while (1) {
 
     /* Output our prompt and get input */
@@ -1111,3 +1115,105 @@ int main(int argc, char** argv) {
   mpc_cleanup(8, Number, Symbol, String, Comment, Sexpr, Qexpr, Expr, Lispy);
   return 0;
 }
+
+#else
+
+static lenv *e = NULL;
+
+void format_lval_to_buffer(lval *v, char *buf, size_t bufsize);
+
+// Wrapper to convert lval to string in a reusable buffer
+void format_lval_to_buffer(lval *v, char *buf, size_t bufsize) {
+    // Simplified version; expand with full support as needed
+    if (v->type == LVAL_NUM) {
+        snprintf(buf, bufsize, "%li", v->num);
+    } else if (v->type == LVAL_ERR) {
+        snprintf(buf, bufsize, "Error: %s", v->err);
+    } else if (v->type == LVAL_SYM) {
+        snprintf(buf, bufsize, "%s", v->sym);
+    } else if (v->type == LVAL_STR) {
+        snprintf(buf, bufsize, "\"%s\"", v->str);  // optionally escape
+    } else if (v->type == LVAL_SEXPR || v->type == LVAL_QEXPR) {
+        char open = (v->type == LVAL_SEXPR) ? '(' : '{';
+        char close = (v->type == LVAL_SEXPR) ? ')' : '}';
+        size_t pos = 0;
+        pos += snprintf(buf + pos, bufsize - pos, "%c", open);
+        for (int i = 0; i < v->count && pos < bufsize - 1; i++) {
+            char tmp[256];
+            format_lval_to_buffer(v->cell[i], tmp, sizeof(tmp));
+            pos += snprintf(buf + pos, bufsize - pos, "%s", tmp);
+            if (i != v->count - 1 && pos < bufsize - 1) {
+                pos += snprintf(buf + pos, bufsize - pos, " ");
+            }
+        }
+        snprintf(buf + pos, bufsize - pos, "%c", close);
+    } else {
+        snprintf(buf, bufsize, "<unknown>");
+    }
+}
+
+// Convert mpc_err_t to string
+char* mpc_err_to_string(mpc_err_t *err) {
+    return mpc_err_string(err);  // Returns malloc'd string
+}
+
+// Initialize interpreter for WebAssembly
+void tyson_init() {
+  Number  = mpc_new("number");
+  Symbol  = mpc_new("symbol");
+  String  = mpc_new("string");
+  Comment = mpc_new("comment");
+  Sexpr   = mpc_new("sexpr");
+  Qexpr   = mpc_new("qexpr");
+  Expr    = mpc_new("expr");
+  Lispy   = mpc_new("lispy");
+
+  mpca_lang(MPCA_LANG_DEFAULT,
+    "                                              \
+      number  : /-?[0-9]+/ ;                       \
+      symbol  : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/ ; \
+      string  : /\"(\\\\.|[^\"])*\"/ ;             \
+      comment : /;[^\\r\\n]*/ ;                    \
+      sexpr   : '(' <expr>* ')' ;                  \
+      qexpr   : '{' <expr>* '}' ;                  \
+      expr    : <number>  | <symbol> | <string>    \
+              | <comment> | <sexpr>  | <qexpr>;    \
+      lispy   : /^/ <expr>* /$/ ;                  \
+    ",
+    Number, Symbol, String, Comment, Sexpr, Qexpr, Expr, Lispy);
+
+  e = lenv_new();
+  lenv_add_builtins(e);
+
+    // Load standard lib
+    lval* args = lval_add(lval_sexpr(), lval_str("std.tyson"));
+    /* Run the files  /  load into memory */
+    lval* x = builtin_load(e, args);
+
+    if (x->type == LVAL_ERR) { lval_println(x); }
+    lval_del(x);
+}
+
+const char* eval_string(const char* input) {
+    static char output[2048];  // return buffer
+    output[0] = '\0';
+
+    mpc_result_t r;
+    if (mpc_parse("<wasm>", input, Lispy, &r)) {
+        lval* x = lval_eval(e, lval_read(r.output));
+        format_lval_to_buffer(x, output, sizeof(output));
+        lval_del(x);
+        mpc_ast_delete(r.output);
+    } else {
+        char *errstr = mpc_err_to_string(r.error);
+        snprintf(output, sizeof(output), "Parse error: %s", errstr);
+        free(errstr);
+        mpc_err_delete(r.error);
+    }
+
+    return output;
+}
+
+/* Functions to use in web page */
+
+#endif
