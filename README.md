@@ -144,10 +144,16 @@ Useful for storing data that we can then manipulate ourselves with functions suc
 
 ## Factoids
 LISP stands for LISt Processor.
+
+Mike Tyson voiced himself in the bizarre cartoon Mike Tyson mysteries.
+
 Python is a lisp.
 
+Tyson famously said: “Everyone has a plan until they get punched in the mouth.”
+
+The phrase “Lisp Curse” is a tongue-in-cheek joke about Lisp developers endlessly writing their own new Lisps.
 
 ## Credits
-The core of this project is based on the book [Build Your Own Lisp](https://www.buildyourownlisp.com/)
+The core of this project is based on the book [Build Your Own Lisp](https://www.buildyourownlisp.com/) which you should absolutely consider reading if you made it this far!
 
 Uses [mpc](https://github.com/orangeduck/mpc) to model the abstract syntax tree.
