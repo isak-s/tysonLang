@@ -657,7 +657,7 @@ lval* lval_call(lenv* e, lval* f, lval* a) {
 
         if (f->formals->count == 0) {
             lval_del(a);
-            return lval_err(TOO_MANY_ARGUMENTS_EXCEPTION("<>", given, total));
+            return lval_err(TOO_MANY_ARGUMENTS_EXCEPTION("<lambda>", given, total));
         }
 
         lval* sym = lval_pop(f->formals, 0);

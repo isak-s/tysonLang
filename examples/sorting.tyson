@@ -1,0 +1,42 @@
+; insertion sort
+
+(fun {TySort lst} {
+    (_tysort lst nil)
+})
+
+(fun {_tysort lst sorted} {
+  ; base case: empty list
+  if (== 0 (len lst)) 
+    {sorted}
+    {
+    let { do
+      ; (map print {"lst:" lst})
+      ; (map print {"sorted:" sorted})
+      ( = {i} (idxOfMin lst)                                                   )
+      ( = {min} (nth i lst)                                                    )
+      ( = {sorted} (join sorted (list min))                                    )
+      ( = {newlst} (
+        if (== i 0)
+        {tail lst}
+        {join (take i lst) (drop (+ i 1) lst)})                                )
+
+      (_tysort newlst sorted)
+    }
+    }
+})
+
+(fun {_idxOfMin lst idx bestIdx bestVal} {
+  if (== lst nil)
+    {bestIdx}
+    {
+      if (< (fst lst) bestVal)
+        {_idxOfMin (tail lst) (+ idx 1) idx (fst lst)}
+        {_idxOfMin (tail lst) (+ idx 1) bestIdx bestVal}
+    }
+})
+
+(fun {idxOfMin lst} {
+  _idxOfMin (tail lst) 1 0 (fst lst)
+})
+
+; end insertion sort
