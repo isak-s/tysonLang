@@ -1,4 +1,4 @@
-(fun {foo x} {
+(fun {Foo x} {
   let { do
 
   (= {y} 100)
@@ -6,7 +6,7 @@
   (+ y x)}
 })
 
-(fun {bar x} {
+(fun {Bar x} {
   let { do
 
   (= {y} 100)

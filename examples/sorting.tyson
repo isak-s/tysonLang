@@ -40,3 +40,22 @@
 })
 
 ; end insertion sort
+
+; QuickSort
+
+(fun {QuickSort lst} {
+
+  if (== 0 (len lst))
+  {nil}
+  {
+    (let { do 
+    (= {pivot} (fst lst)                                                       )
+    (= {left} (QuickSort (filter (\ {x} {< x pivot}) (tail lst) ) )            )
+    (= {right} (QuickSort (filter (\ {x} {>= x pivot}) (tail lst) ) )          )
+
+    (join left (list pivot) right)
+    })
+  }
+})
+
+; end QuickSort

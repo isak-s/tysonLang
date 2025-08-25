@@ -1,4 +1,4 @@
-(fun {fib n} {
+(fun {Fib n} {
     ; if item 0 evaluates to true, item 1 gets returned when using select
     select
         {(== n 0) 0} 
