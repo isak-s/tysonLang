@@ -1,0 +1,14 @@
+(fun {BinToDec binStr} {
+    ; reverse to make it easier to traverse in sequence
+    _BinToDec 0 (reverse binStr) 1
+})
+
+(fun {_BinToDec sum binStr pow} {
+    ; if item 0 evaluates to true, item 1 gets returned when using select
+
+    select
+        {(== (len binStr) 0) sum}
+        {(== (fst binStr) 0) (_BinToDec sum (tail binStr) (* pow 2))} 
+        {otherwise (_BinToDec (+ sum pow) (tail binStr) (* pow 2))}
+})
+
